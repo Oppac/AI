@@ -4,11 +4,12 @@ import numpy as np
 
 class Perceptron:
     def __init__(self):
-        self.weights = np.array([-1, -1])
+        self.bias = 0
+        self.weights = np.array([1, 1])
         self.learning_rate = 0.7
 
     def guess(self, input):
-        sum = np.dot(input, self.weights)
+        sum = np.dot(input, self.weights) + self.bias
         return 1 if sum > 0 else -1
 
     def train(self, input, target, guesses):
@@ -17,16 +18,17 @@ class Perceptron:
         error = target - guess
         for i in range(len(self.weights)):
             self.weights[i] += error * input[i] * self.learning_rate
+        self.bias += error * self.learning_rate
 
     def guess_line(self, x):
-        m = -(1 / self.weights[1]) / (1 / self.weights[0])
-        b = -1 / self.weights[1]
+        m = -(self.bias/self.weights[1]) - (self.weights[0]/self.weights[1])
+        b = -self.bias
         return m * x + b
 
 #####################################################
 
 def line(x):
-    return 0.4 * x + 4
+    return 0.2 * x + 200
 
 def show(x, y, values, p):
     colors = ['red', 'blue']
@@ -42,8 +44,8 @@ def main():
     p = Perceptron()
 
     # Training data
-    x = np.random.randint(1, width, size=size)
-    y = np.random.randint(1, height, size=size)
+    x = np.random.randint(0, width, size=size)
+    y = np.random.randint(0, height, size=size)
     labels = [1 if y[i] > line(x[i]) else -1 for i in range(size)]
     inputs = [[x[i], y[i]] for i in range(size)]
 
@@ -53,9 +55,10 @@ def main():
         guesses = []
         for i in range(size):
             p.train(inputs[i], labels[i], guesses)
-        show(x, y, guesses, p)
+        #show(x, y, guesses, p)
         if guesses == labels:
             break
+    show(x, y, guesses, p)
 
 
 main()
