@@ -5,17 +5,16 @@ import math
 import sys
 
 
-def euclidian_similarity(user_ratings, user_1, user_2):
+def euclidian_distance(user_ratings, user_1, user_2):
     sum_squares = 0
     common = common_movies(user_ratings, user_1, user_2)
-    print(common)
     if not common:
         return 0
     for i in common:
         diff = i[1] - i[2]
         sum_squares += diff * diff
     sqrt_diff = math.sqrt(sum_squares)
-    similarity = 1 / (1 + sqrt_diff)
+    similarity = len(common) / (1 + sqrt_diff)
     return similarity
 
 
@@ -33,6 +32,19 @@ def common_movies(user_ratings, user_1, user_2):
     return common
 
 
+def k_nearest_neighbors(user_ratings, k, user):
+    similarity = []
+    for i in user_ratings.keys():
+        try:
+            if not user == int(i):
+                s = euclidian_distance(user_ratings, user, int(i))
+                similarity.append([i, s])
+        except:
+            pass
+    similarity.sort(key=lambda x:x[1], reverse=True)
+    return similarity[:k]
+
+
 def read_by_user():
     user_ratings = {}
     with open("movie_dataset/ratings.csv") as csv_file:
@@ -48,13 +60,11 @@ def read_by_user():
 def main():
     user_ratings = read_by_user()
     keys = list(user_ratings.keys())
-    if len(sys.argv) == 3:
+    if len(sys.argv) == 2:
         user_1 = int(keys[int(sys.argv[1])-1])
-        user_2 = int(keys[int(sys.argv[2])-1])
     else:
         user_1 = int(keys[0])
-        user_2 = int(keys[1])
-    print(euclidian_similarity(user_ratings, user_1, user_2))
+    print(k_nearest_neighbors(user_ratings, 10, user_1))
 
 
 main()
