@@ -16,7 +16,10 @@ def linear_regression(x_data, y_data):
         num += (x_data[i] - x_mean) * (y_data[i] - y_mean)
         den += (x_data[i] - x_mean) * (x_data[i] - x_mean)
 
-    m = num / den
+    if den != 0:
+        m = num / den
+    else:
+        m = 0
     b = y_mean - m * x_mean
     return m, b
 
@@ -42,7 +45,10 @@ def show(x_data, y_data):
 def main():
     global x_data, y_data
     if len(sys.argv) > 1:
-        size = int(sys.argv[1])
+        if int(sys.argv[1]) > 0:
+            size = int(sys.argv[1])
+        else:
+            size = 1
     else:
         size = 10
 
