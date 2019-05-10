@@ -1,3 +1,5 @@
+# Toy linear algebra library
+
 from random import randint
 
 class Matrix:
@@ -22,40 +24,45 @@ class Matrix:
                        for i in range(self.nb_rows)]
 
 
-
 ####################################################
 
 
 def add_matrices(m1, m2):
+    m3 = Matrix(m1.nb_rows, m1.nb_cols)
     if (m1.nb_rows == m2.nb_rows) and (m1.nb_cols == m2.nb_cols):
-        m3 = Matrix(m1.nb_rows, m1.nb_cols)
         m3.values = [[j + k for j, k in zip(m1.values[i], m2.values[i])]
                      for i in range(m1.nb_rows)]
-        return m3
     else:
         print("Matrices must have the same size")
+    return m3
 
 
 def multiply_matrices(m1, m2):
-    val = []
+    m3 = Matrix(m1.nb_rows, m2.nb_cols)
     if (m1.nb_cols == m2.nb_rows):
-        m3 = Matrix(m1.nb_rows, m2.nb_cols)
         for i in range(m1.nb_rows):
             for j in range(m2.nb_cols):
                 for k in range(m2.nb_rows):
                     m3.values[i][j] += m1.values[i][k] * m2.values[k][j]
-        return m3
     else:
         print("Invalid size: m1.nb_cols != m2.nb_rows")
+    return m3
+
+def transpose(matrix):
+    trans = Matrix(matrix.nb_cols, matrix.nb_rows)
+    for i in range(matrix.nb_rows):
+        for j in range(matrix.nb_cols):
+            trans.values[j][i] += matrix.values[i][j]
+    return trans
 
 def main():
-    d1 = [[1,1,2],[2,1,1]]
+    d1 = [[2,3,2],[2,1,1]]
     d2 = [[1, 1], [1, 1], [1, 2]]
     m1 = Matrix(2, 3, d1)
     print(m1.values)
     m2 = Matrix(3, 2, d2)
     print(m2.values)
-    m3 = multiply_matrices(m1, m2)
+    m3 = multiply_matrices(m1, m1)
     print(m3.values)
 
 main()
