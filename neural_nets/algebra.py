@@ -54,15 +54,3 @@ def transpose(matrix):
         for j in range(matrix.nb_cols):
             trans.values[j][i] += matrix.values[i][j]
     return trans
-
-def main():
-    d1 = [[2,3,2],[2,1,1]]
-    d2 = [[1, 1], [1, 1], [1, 2]]
-    m1 = Matrix(2, 3, d1)
-    print(m1.values)
-    m2 = Matrix(3, 2, d2)
-    print(m2.values)
-    m3 = multiply_matrices(m1, m1)
-    print(m3.values)
-
-main()
