@@ -5,7 +5,7 @@ import numpy as np
 class Perceptron:
     def __init__(self):
         self.bias = 0
-        self.weights = np.array([1, 1])
+        self.weights = np.random.choice([1, -1], 2)
         self.learning_rate = 0.7
 
     def guess(self, input):
@@ -22,13 +22,14 @@ class Perceptron:
 
     def guess_line(self, x):
         m = -(self.bias/self.weights[1]) - (self.weights[0]/self.weights[1])
+        print(m)
         b = -self.bias
         return m * x + b
 
 #####################################################
 
 def line(x):
-    return 0.2 * x + 200
+    return 0.8 * x
 
 def show(x, y, values, p):
     colors = ['red', 'blue']
@@ -49,15 +50,16 @@ def main():
     labels = [1 if y[i] > line(x[i]) else -1 for i in range(size)]
     inputs = [[x[i], y[i]] for i in range(size)]
 
-    show(x, y, labels, p)
+    #show(x, y, labels, p)
     show(x, y, [p.guess(inputs[i]) for i in range(size)], p)
     while True:
         guesses = []
         for i in range(size):
             p.train(inputs[i], labels[i], guesses)
-        #show(x, y, guesses, p)
+        show(x, y, guesses, p)
         if guesses == labels:
             break
+    print(p.weights)
     show(x, y, guesses, p)
 
 
