@@ -25,6 +25,10 @@ class MutlilayerPerceptrion:
         output = self.weights_ho.multiply_matrices(hidden)
         output = output.add_vector(self.bias_o)
         output.add_scalar(self.sigmoid(1))
+        return output
+
+    def train(inputs, answers):
+        pass
 
     def sigmoid(self, x):
         return 1 / (1 + exp(-x))
@@ -34,6 +38,7 @@ def main():
     brain = MutlilayerPerceptrion(2, 2, 1)
     inputs = Matrix()
     inputs.give_values(data)
-    output = brain.feedforward(inputs)
+    output = brain.feedforward(inputs).values
+    print(output)
 
 main()
