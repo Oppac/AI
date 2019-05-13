@@ -1,3 +1,4 @@
+from math import exp
 from random import randint
 
 class Matrix:
@@ -16,13 +17,16 @@ class Matrix:
                       for i in range(self.nb_cols)] for _ in range(self.nb_rows)]
 
     def add_scalar(self, scalar):
-        self.values = [[j + scalar for j in self.values[i]]
+        result = Matrix(self.nb_rows, self.nb_cols)
+        result.values = [[j + scalar for j in self.values[i]]
                        for i in range(self.nb_rows)]
+        return result
 
     def multiply_scalar(self, scalar):
-        self.values = [[j * scalar for j in self.values[i]]
+        result = Matrix(self.nb_rows, self.nb_cols)
+        result.values = [[j * scalar for j in self.values[i]]
                        for i in range(self.nb_rows)]
-
+        return result
 
     def add_vector(self, vector):
         m3 = Matrix(self.nb_rows, self.nb_cols)
@@ -33,17 +37,15 @@ class Matrix:
             print("{}x{} is not a vector".format(vector.nb_rows, vector.nb_cols))
         return m3
 
-
     def add_matrices(self, m2):
         m3 = Matrix(self.nb_rows, self.nb_cols)
         if (self.nb_rows == m2.nb_rows) and (self.nb_cols == m2.nb_cols):
-            m3.values = [[j + k for j, k in zip(self.values[i], vector.values[i])]
+            m3.values = [[j + k for j, k in zip(self.values[i], m2.values[i])]
                          for i in range(self.nb_rows)]
         else:
             print("Invalid size: {}x{} != {}x{}".format(
                   self.nb_rows, self.nb_cols, m2.nb_rows, m2.nb_cols))
         return m3
-
 
     def multiply_matrices(self, m2):
         m3 = Matrix(self.nb_rows, m2.nb_cols)
@@ -56,13 +58,30 @@ class Matrix:
             print("Invalid size: {} != {}".format(self.nb_cols, m2.nb_rows))
         return m3
 
-
     def transpose(self):
         trans = Matrix(self.nb_cols, self.nb_rows)
         for i in range(self.nb_rows):
             for j in range(self.nb_cols):
                 trans.values[j][i] += self.values[i][j]
         return trans
+
+    def sigmoid(self, x):
+        return 1 / (1 + exp(-x))
+
+    def apply_sigmoid(self):
+        result = Matrix(self.nb_rows, self.nb_cols)
+        for i in range(self.nb_rows):
+            for j in range(self.nb_cols):
+                result.values[i][j] += self.sigmoid(self.values[i][j])
+        return result
+
+    def apply_derivative_sigmoid(self):
+        result = Matrix(self.nb_rows, self.nb_cols)
+        for i in range(self.nb_rows):
+            for j in range(self.nb_cols):
+                result.values[i][j] += (self.sigmoid(self.values[i][j])
+                                       * (1 - self.sigmoid(self.values[i][j])))
+        return result
 
     def print_size(self):
         print("Size: {}x{}".format(self.nb_rows, self.nb_cols))
