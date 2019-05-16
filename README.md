@@ -1,2 +1,2 @@
-AI Project
-Neural net -> Perceptron from scratch
+AI Project:
+ * Neural net -> Multi-layer perceptron from scratch
