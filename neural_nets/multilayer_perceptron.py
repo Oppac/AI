@@ -1,6 +1,6 @@
 from matrix import Matrix
 
-class MutlilayerPerceptrion:
+class MutlilayerPerceptron:
     def __init__(self, nb_inputs, nb_hidden, nb_outputs, learning_rate=0.1):
         self.learning_rate = learning_rate
         self.input_nodes = nb_inputs
@@ -59,18 +59,11 @@ class MutlilayerPerceptrion:
         self.w_input_hidden = self.w_input_hidden.add_matrices(deltaW_hidden)
 
 
-    def train(self, inputs, answers):
+    def train(self, input_data, correct_outputs):
+        inputs = Matrix(); answers = Matrix()
+        inputs.give_values(input_data)
+        answers.give_values(correct_outputs)
+
         output_guess, hidden_guess = self.feedforward(inputs)
         output_errors = self.guess_error(output_guess, answers)
         self.backpropagation(output_guess, output_errors, hidden_guess, inputs)
-
-def main():
-    data = [[2], [0], [1]]
-    brain = MutlilayerPerceptrion(3, 2, 3)
-    inputs = Matrix()
-    answers = Matrix()
-    answers.give_values([[1], [1], [1]])
-    inputs.give_values(data)
-    brain.train(inputs, answers)
-
-main()

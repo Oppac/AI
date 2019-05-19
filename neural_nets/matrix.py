@@ -9,7 +9,10 @@ class Matrix:
 
     def give_values(self, values):
         self.nb_rows = len(values)
-        self.nb_cols = len(values[0])
+        try:
+            self.nb_cols = len(values[0])
+        except:
+            self.nb_cols = 1
         self.values = values
 
     def randomize(self, lower, upper):
