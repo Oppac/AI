@@ -37,13 +37,22 @@ class Matrix:
             print("{}x{} is not a vector".format(vector.nb_rows, vector.nb_cols))
         return m3
 
+    def multiply_vector(self, vector):
+        m3 = Matrix(self.nb_rows, self.nb_cols)
+        if (vector.nb_cols == 1):
+            m3.values = [[j * vector.values[i][0] for j in self.values[i]]
+                         for i in range(self.nb_rows)]
+        else:
+            print("{}x{} is not a vector".format(vector.nb_rows, vector.nb_cols))
+        return m3
+
     def add_matrices(self, m2):
         m3 = Matrix(self.nb_rows, self.nb_cols)
         if (self.nb_rows == m2.nb_rows) and (self.nb_cols == m2.nb_cols):
             m3.values = [[j + k for j, k in zip(self.values[i], m2.values[i])]
                          for i in range(self.nb_rows)]
         else:
-            print("Invalid size: {}x{} != {}x{}".format(
+            print("Invalid size addition: {}x{} != {}x{}".format(
                   self.nb_rows, self.nb_cols, m2.nb_rows, m2.nb_cols))
         return m3
 
@@ -55,7 +64,7 @@ class Matrix:
                     for k in range(m2.nb_rows):
                         m3.values[i][j] += self.values[i][k] * m2.values[k][j]
         else:
-            print("Invalid size: {} != {}".format(self.nb_cols, m2.nb_rows))
+            print("Invalid size multiply: {} != {}".format(self.nb_cols, m2.nb_rows))
         return m3
 
     def transpose(self):
