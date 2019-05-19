@@ -8,7 +8,7 @@ input_data = [ [[1], [0]], [[0], [1]], [[0], [0]], [[1], [1]] ]
 correct_outputs = [ [[1]], [[1]], [[0]], [[0]] ]
 
 test = Matrix()
-test.give_values([[1], [0]])
+test.give_values([[0], [0]])
 
 for i in range(5000):
     input_rand = random.choice(input_data)
