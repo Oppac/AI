@@ -21,11 +21,11 @@ class MutlilayerPerceptrion:
 
     def feedforward(self, inputs):
         hidden_guess = self.w_input_hidden.multiply_matrices(inputs)
-        #hidden = hidden.add_vector(self.bias_hidden)
+        hidden_guess = hidden_guess.add_vector(self.bias_hidden)
         hidden_guess = hidden_guess.apply_sigmoid()
 
         output_guess = self.w_hidden_output.multiply_matrices(hidden_guess)
-        #output = output.add_vector(self.bias_output)
+        output_guess = output_guess.add_vector(self.bias_output)
         output_guess = output_guess.apply_sigmoid()
         return output_guess, hidden_guess
 
@@ -46,7 +46,9 @@ class MutlilayerPerceptrion:
         hidden_errors = w_hidden_output_T.multiply_matrices(output_errors)
 
         gradient_ouput = self.get_gradient(output_guess, output_errors)
+        self.bias_output = self.bias_output.add_matrices(gradient_ouput)
         gradient_hidden = self.get_gradient(hidden_guess, hidden_errors)
+        self.bias_hidden = self.bias_hidden.add_matrices(gradient_hidden)
 
         hidden_T = hidden_guess.transpose()
         deltaW_output = gradient_ouput.multiply_matrices(hidden_T)
@@ -61,29 +63,6 @@ class MutlilayerPerceptrion:
         output_guess, hidden_guess = self.feedforward(inputs)
         output_errors = self.guess_error(output_guess, answers)
         self.backpropagation(output_guess, output_errors, hidden_guess, inputs)
-
-'''
-        o_gradients = guess.apply_derivative_sigmoid()
-        o_gradients = o_gradients.multiply_matrices(output_errors)
-        o_gradients = o_gradients.multiply_scalar(self.learning_rate)
-        print(o_gradients.values)
-
-        hidden_T = hidden.transpose()
-        w_hidden_output_deltas = o_gradients.multiply_matrices(hidden_T)
-        self.w_hidden_output = self.w_hidden_output.add_matrices(w_hidden_output_deltas)
-        self.bias_output = self.bias_output.add_matrices(o_gradients)
-
-        h_gradients = hidden.apply_derivative_sigmoid()
-        print(h_gradients.values)
-        h_gradients = h_gradients.multiply_matrices(hidden_errors)
-        h_gradients = h_gradients.multiply_scalar(self.learning_rate)
-        #print(h_gradients.values)
-
-        inputs_T = inputs.transpose()
-        w_input_hidden_deltas = h_gradients.multiply_matrices(inputs_T)
-        self.w_input_hidden = self.w_input_hidden.add_matrices(w_input_hidden_deltas)
-        self.bias_hidden = self.bias_hidden.add_matrices(h_gradients)
-'''
 
 def main():
     data = [[2], [0], [1]]
