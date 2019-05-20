@@ -3,7 +3,7 @@
 # https://github.com/googlecreativelab/quickdraw-dataset
 
 import numpy as np
-from ../neural_nets/multilayer_perceptron import MutlilayerPerceptron
+from multilayer_perceptron import MutlilayerPerceptron
 
 dog_data = np.load("doodle_dataset/dog_train_1200.npy")
 fish_data = np.load("doodle_dataset/fish_train_1200.npy")
