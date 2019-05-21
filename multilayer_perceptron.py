@@ -37,6 +37,7 @@ class MutlilayerPerceptron:
 
     def bias_init(self):
         bias_vectors = []
+        bias_vectors.append(Matrix(self.input_nodes, 1))
         for _ in range(self.hidden_layers):
             hidden_bias = self.new_matrix(self.hidden_nodes, 1)
             bias_vectors.append(hidden_bias)
@@ -48,19 +49,18 @@ class MutlilayerPerceptron:
 ################################################################################
 
     def feedforward(self, inputs):
-        hidden_guess = self.weight_matrices[0].multiply_matrices(inputs)
-        hidden_guess = hidden_guess.add_vector(self.bias_vectors[0])
-        hidden_guess = hidden_guess.apply_sigmoid()
-
-        output_guess = self.weight_matrices[-1].multiply_matrices(hidden_guess)
-        output_guess = output_guess.add_vector(self.bias_vectors[-1])
-        output_guess = output_guess.apply_sigmoid()
-        return output_guess, hidden_guess
+        guesses = [inputs]
+        for i in range(len(self.weight_matrices)):
+            guess = self.weight_matrices[i].multiply_matrices(guesses[i])
+            guess = guess.add_vector(self.bias_vectors[i])
+            guess = guess.apply_sigmoid()
+            guesses.append(guess)
+        return guesses
 
     # Error = answers - guess
-    def guess_error(self, guess, answers):
-        guess = guess.multiply_scalar(-1)
-        errors = answers.add_matrices(guess)
+    def guess_error(self, guesses, answers):
+        guesses = guesses.multiply_scalar(-1)
+        errors = answers.add_matrices(guesses)
         return errors
 
     def get_gradient(self, guess, error):
@@ -69,29 +69,23 @@ class MutlilayerPerceptron:
         gradient = gradient.multiply_scalar(self.learning_rate)
         return gradient
 
-    def backpropagation(self, output_guess, output_errors, hidden_guess, inputs):
-        w_hidden_output_T = self.weight_matrices[-1].transpose()
-        hidden_errors = w_hidden_output_T.multiply_matrices(output_errors)
-
-        gradient_ouput = self.get_gradient(output_guess, output_errors)
-        self.bias_vectors[-1] = self.bias_vectors[-1].add_matrices(gradient_ouput)
-        gradient_hidden = self.get_gradient(hidden_guess, hidden_errors)
-        self.bias_vectors[0] = self.bias_vectors[0].add_matrices(gradient_hidden)
-
-        hidden_T = hidden_guess.transpose()
-        deltaW_output = gradient_ouput.multiply_matrices(hidden_T)
-        self.weight_matrices[-1] = self.weight_matrices[-1].add_matrices(deltaW_output)
-
-        inputs_T = inputs.transpose()
-        deltaW_hidden = gradient_hidden.multiply_matrices(inputs_T)
-        self.weight_matrices[0] = self.weight_matrices[0].add_matrices(deltaW_hidden)
-
+    def backpropagation(self, guesses, answers):
+        errors = [self.guess_error(guesses[-1], answers)]
+        for i in range(len(guesses)-1, 0, -1):
+            delta = self.get_gradient(guesses[i], errors[-1])
+            self.bias_vectors[i] = self.bias_vectors[i].add_matrices(delta)
+            guess_T = guesses[i-1].transpose()
+            delta = delta.multiply_matrices(guess_T)
+            weights_transpose = self.weight_matrices[i-1].transpose()
+            self.weight_matrices[i-1] = self.weight_matrices[i-1].add_matrices(delta)
+            new_error = weights_transpose.multiply_matrices(errors[-1])
+            errors.append(new_error)
 
     def train(self, input_data, correct_outputs):
         inputs = Matrix(); answers = Matrix()
         inputs.give_values(input_data)
         answers.give_values(correct_outputs)
 
-        output_guess, hidden_guess = self.feedforward(inputs)
-        output_errors = self.guess_error(output_guess, answers)
-        self.backpropagation(output_guess, output_errors, hidden_guess, inputs)
+        guesses = self.feedforward(inputs)
+        #print([guesses[i].values for i in range(len(guesses))])
+        self.backpropagation(guesses, answers)
