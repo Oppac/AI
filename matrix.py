@@ -1,5 +1,5 @@
 from math import exp
-from random import randrange
+from random import uniform
 
 class Matrix:
     def __init__(self, nb_rows=1, nb_cols=1, values=None):
@@ -16,7 +16,7 @@ class Matrix:
         self.values = values
 
     def randomize(self, lower, upper):
-        self.values = [[randrange(lower, upper)
+        self.values = [[uniform(lower, upper)
                       for i in range(self.nb_cols)] for _ in range(self.nb_rows)]
 
     def add_scalar(self, scalar):

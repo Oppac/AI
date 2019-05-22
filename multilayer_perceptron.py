@@ -70,16 +70,15 @@ class MutlilayerPerceptron:
         return gradient
 
     def backpropagation(self, guesses, answers):
-        errors = [self.guess_error(guesses[-1], answers)]
-        for i in range(len(guesses)-1, 0, -1):
-            delta = self.get_gradient(guesses[i], errors[-1])
-            self.bias_vectors[i] = self.bias_vectors[i].add_matrices(delta)
-            guess_T = guesses[i-1].transpose()
-            delta = delta.multiply_matrices(guess_T)
+        error = self.guess_error(guesses[-1], answers)
+        for i in range(self.hidden_layers+1, 0, -1):
             weights_transpose = self.weight_matrices[i-1].transpose()
+            delta = self.get_gradient(guesses[i], error)
+            self.bias_vectors[i] = self.bias_vectors[i].add_matrices(delta)
+            previous_guess_T = guesses[i-1].transpose()
+            delta = delta.multiply_matrices(previous_guess_T)
             self.weight_matrices[i-1] = self.weight_matrices[i-1].add_matrices(delta)
-            new_error = weights_transpose.multiply_matrices(errors[-1])
-            errors.append(new_error)
+            error = weights_transpose.multiply_matrices(error)
 
     def train(self, input_data, correct_outputs):
         inputs = Matrix(); answers = Matrix()
@@ -87,5 +86,4 @@ class MutlilayerPerceptron:
         answers.give_values(correct_outputs)
 
         guesses = self.feedforward(inputs)
-        #print([guesses[i].values for i in range(len(guesses))])
         self.backpropagation(guesses, answers)
