@@ -52,7 +52,8 @@ class MutlilayerPerceptron:
         guesses = [inputs]
         for i in range(len(self.weight_matrices)):
             guess = self.weight_matrices[i].multiply_matrices(guesses[i])
-            #guess = guess.add_vector(self.bias_vectors[i])
+            guess = guess.add_vector(self.bias_vectors[i])
+            print(guess.values)
             guess = guess.apply_sigmoid()
             guesses.append(guess)
         return guesses
@@ -74,7 +75,7 @@ class MutlilayerPerceptron:
         for i in range(self.hidden_layers+1, 0, -1):
             weights_transpose = self.weight_matrices[i-1].transpose()
             delta = self.get_gradient(guesses[i], error)
-            #self.bias_vectors[i] = self.bias_vectors[i].add_matrices(delta)
+            self.bias_vectors[i] = self.bias_vectors[i].add_matrices(delta)
             previous_guess_T = guesses[i-1].transpose()
             delta = delta.multiply_matrices(previous_guess_T)
             self.weight_matrices[i-1] = self.weight_matrices[i-1].add_matrices(delta)

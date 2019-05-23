@@ -67,6 +67,7 @@ class Matrix:
                     for k in range(m2.nb_rows):
                         m3.values[i][j] += self.values[i][k] * m2.values[k][j]
         else:
+            print(self.nb_rows, self.nb_cols)
             exit("Invalid size multiply: {} != {}".format(self.nb_cols, m2.nb_rows))
         return m3
 
