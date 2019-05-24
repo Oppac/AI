@@ -22,7 +22,7 @@ fish_testing = np.load("doodle_dataset/fish_testing_200.npy")
 octopus_data = np.load("doodle_dataset/octopus_train_1200.npy")
 octopus_testing = np.load("doodle_dataset/octopus_testing_200.npy")
 
-layers = [784, 20, 1, 2]
+layers = [784, 7, 1, 2]
 learning_rate = 0.1
 neural_net = MutlilayerPerceptron(layers, learning_rate)
 
@@ -42,9 +42,23 @@ for i in range(len(fish_data)):
     neural_net.train(input_rand, output_rand)
 
 inputs = Matrix(784, 1)
-error = 0
-for i in range(10):
+size = 100
+fish_score = 0
+octopus_score = 0
+
+for i in range(size):
     inputs.give_values(vectorize(fish_testing[i]))
-    result = neural_net.feedforward(inputs)[-1].values[0][0]
-    error += result
-print("Accuracy = " + str(error/10))
+    result = neural_net.feedforward(inputs)[-1].values
+    print(result)
+    if result[0][0] > result[1][0]:
+        fish_score += 1
+
+for i in range(size):
+    inputs.give_values(vectorize(octopus_testing[i]))
+    result = neural_net.feedforward(inputs)[-1].values
+    print(result)
+    if result[1][0] > result[0][0]:
+        octopus_score += 1
+print()
+print("Fish accuracy: " + str(fish_score) + "%")
+print("Octopus accuracy: " + str(octopus_score) + "%")
