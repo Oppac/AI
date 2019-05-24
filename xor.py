@@ -5,8 +5,8 @@ from multilayer_perceptron import MutlilayerPerceptron
 xor_data = [ [[1], [0]], [[0], [1]], [[0], [0]], [[1], [1]] ]
 correct_outputs = [ [[1]], [[1]], [[0]], [[0]] ]
 
-layers = [2, 1, 2, 1]
-learning_rate = 0.1
+layers = [2, 2, 1, 1]
+learning_rate = 0.5
 neural_net = MutlilayerPerceptron(layers, learning_rate)
 
 for i in range(10000):
