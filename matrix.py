@@ -81,6 +81,12 @@ class Matrix:
     def sigmoid(self, x):
         return 1 / (1 + exp(-x))
 
+    def relu(self, x):
+        return max(x, 0)
+
+    def relu_prime(self, x):
+        return float(x > 0)
+
     def apply_sigmoid(self):
         result = Matrix(self.nb_rows, self.nb_cols)
         for i in range(self.nb_rows):
@@ -88,12 +94,26 @@ class Matrix:
                 result.values[i][j] += self.sigmoid(self.values[i][j])
         return result
 
-    def apply_derivative_sigmoid(self):
+    def apply_sigmoid_prime(self):
         result = Matrix(self.nb_rows, self.nb_cols)
         for i in range(self.nb_rows):
             for j in range(self.nb_cols):
                 result.values[i][j] += (self.sigmoid(self.values[i][j])
                                        * (1 - self.sigmoid(self.values[i][j])))
+        return result
+
+    def apply_relu(self):
+        result = Matrix(self.nb_rows, self.nb_cols)
+        for i in range(self.nb_rows):
+            for j in range(self.nb_cols):
+                result.values[i][j] += self.relu(self.values[i][j])
+        return result
+
+    def apply_relu_prime(self):
+        result = Matrix(self.nb_rows, self.nb_cols)
+        for i in range(self.nb_rows):
+            for j in range(self.nb_cols):
+                result.values[i][j] += self.relu_prime(self.values[i][j])
         return result
 
     def print_size(self):
