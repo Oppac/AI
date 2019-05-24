@@ -49,14 +49,12 @@ octopus_score = 0
 for i in range(size):
     inputs.give_values(vectorize(fish_testing[i]))
     result = neural_net.feedforward(inputs)[-1].values
-    print(result)
     if result[0][0] > result[1][0]:
         fish_score += 1
 
 for i in range(size):
     inputs.give_values(vectorize(octopus_testing[i]))
     result = neural_net.feedforward(inputs)[-1].values
-    print(result)
     if result[1][0] > result[0][0]:
         octopus_score += 1
 print()
