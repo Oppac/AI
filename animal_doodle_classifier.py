@@ -3,9 +3,19 @@
 # https://github.com/googlecreativelab/quickdraw-dataset
 
 import random
+import sys
 import numpy as np
 from multilayer_perceptron import MutlilayerPerceptron
 from matrix import Matrix
+
+fish_data = np.load("doodle_dataset/fish_train_1200.npy")
+fish_testing = np.load("doodle_dataset/fish_testing_200.npy")
+
+octopus_data = np.load("doodle_dataset/octopus_train_1200.npy")
+octopus_testing = np.load("doodle_dataset/octopus_testing_200.npy")
+
+owl_data = np.load("doodle_dataset/owl_train_1200.npy")
+owl_testing = np.load("doodle_dataset/owl_testing_200.npy")
 
 def vectorize(data):
     vector_data = []
@@ -16,47 +26,84 @@ def vectorize(data):
             vector_data.append([0])
     return vector_data
 
-fish_data = np.load("doodle_dataset/fish_train_1200.npy")
-fish_testing = np.load("doodle_dataset/fish_testing_200.npy")
+def main():
+    layers = [784, 15, 1, 3]
+    learning_rate = 0.1
+    neural_net = MutlilayerPerceptron(layers, learning_rate)
 
-octopus_data = np.load("doodle_dataset/octopus_train_1200.npy")
-octopus_testing = np.load("doodle_dataset/octopus_testing_200.npy")
+    animals = ['fish', 'octo', 'owl']
+    indexes = [0, 0, 0]
+    size = 1500
 
-layers = [784, 7, 1, 2]
-learning_rate = 0.1
-neural_net = MutlilayerPerceptron(layers, learning_rate)
+    for i in range(size):
+        animal_rand = random.choice(animals)
+        if animal_rand == 'fish':
+            indexes[0] += 1
+            input_rand = vectorize(fish_data[indexes[0]])
+            output_rand = [ [1], [0], [0] ]
+        elif animal_rand == 'octo':
+            indexes[1] += 1
+            input_rand = vectorize(octopus_data[indexes[1]])
+            output_rand = [ [0], [1], [0] ]
+        elif animal_rand == 'owl':
+            indexes[2] += 1
+            input_rand = vectorize(owl_data[indexes[2]])
+            output_rand = [ [0], [0], [1] ]
+        neural_net.train(input_rand, output_rand)
 
-animals = ['f', 'o']
-indexes = [0, 0]
+    inputs = Matrix(784, 1)
+    size = 100
+    score = [0, 0, 0]
 
-for i in range(len(fish_data)):
-    animal_rand = random.choice(animals)
-    if animal_rand == 'f':
-        indexes[0] += 1
-        input_rand = vectorize(fish_data[indexes[0]])
-        output_rand = [ [1], [0] ]
-    elif animal_rand == 'o':
-        indexes[1] += 1
-        input_rand = vectorize(octopus_data[indexes[1]])
-        output_rand = [ [0], [1] ]
-    neural_net.train(input_rand, output_rand)
+    for i in range(size):
+        inputs.give_values(vectorize(fish_testing[i]))
+        result = neural_net.feedforward(inputs)[-1].values
+        if result[0][0] > result[1][0] and result[0][0] > result[2][0]:
+            score[0] += 1
 
-inputs = Matrix(784, 1)
-size = 100
-fish_score = 0
-octopus_score = 0
+    for i in range(size):
+        inputs.give_values(vectorize(octopus_testing[i]))
+        result = neural_net.feedforward(inputs)[-1].values
+        if result[1][0] > result[0][0] and result[1][0] > result[2][0]:
+            score[1] += 1
 
-for i in range(size):
-    inputs.give_values(vectorize(fish_testing[i]))
-    result = neural_net.feedforward(inputs)[-1].values
-    if result[0][0] > result[1][0]:
-        fish_score += 1
+    for i in range(size):
+        inputs.give_values(vectorize(owl_testing[i]))
+        result = neural_net.feedforward(inputs)[-1].values
+        if result[2][0] > result[0][0] and result[2][0] > result[1][0]:
+            score[2] += 1
 
-for i in range(size):
-    inputs.give_values(vectorize(octopus_testing[i]))
-    result = neural_net.feedforward(inputs)[-1].values
-    if result[1][0] > result[0][0]:
-        octopus_score += 1
-print()
-print("Fish accuracy: " + str(fish_score) + "%")
-print("Octopus accuracy: " + str(octopus_score) + "%")
+    print()
+    print(indexes)
+    print("Fish accuracy: " + str(score[0]) + "%")
+    print("Octopus accuracy: " + str(score[1]) + "%")
+    print("Owl accuracy: " + str(score[2]) + "%")
+    total = sum(score) // 3
+    print("Total accuracy: " + str(total) + "%\n")
+
+    while True:
+        animal = input("Fish | Octopus | Owl: ").lower()
+        if animal == "q" or animal == "quit":
+            break
+
+        img_nb = int(input("Image number [0-100]: ")) + 100
+        test = Matrix(784, 1)
+
+        if animal == "fish":
+            test.give_values(vectorize(fish_testing[img_nb]))
+        elif animal == "octopus":
+            test.give_values(vectorize(octopus_testing[img_nb]))
+        elif animal == "owl":
+            test.give_values(vectorize(owl_testing[img_nb]))
+        result = neural_net.feedforward(test)[-1].values
+        if result[0][0] > result[1][0] and result[0][0] > result[2][0]:
+            ani = "fish"
+        elif result[1][0] > result[0][0] and result[1][0] > result[2][0]:
+            ani = "octopus"
+        elif result[2][0] > result[0][0] and result[2][0] > result[1][0]:
+            ani = "owl"
+
+        print("\nInput image is the {} image number {}".format(animal, img_nb-100))
+        print("This image is an " + ani + "\n")
+
+main()
