@@ -2,11 +2,20 @@
 # Dogs doodles
 # https://github.com/googlecreativelab/quickdraw-dataset
 
+# Classify the doodle of animals using the neural net made from scratch
+# Three animals are implemented: the fish, the octopus and the owl
+# Expected accurency is around 80%
+
+# TODO -> Load models instead of training each time
+
 import random
-import sys
 import numpy as np
 from multilayer_perceptron import MutlilayerPerceptron
 from matrix import Matrix
+
+# The images of the animals, by default in the doodle_dataset folder
+# Training set: 1200 images
+# Testing set: 200 images
 
 fish_data = np.load("doodle_dataset/fish_train_1200.npy")
 fish_testing = np.load("doodle_dataset/fish_testing_200.npy")
@@ -17,6 +26,7 @@ octopus_testing = np.load("doodle_dataset/octopus_testing_200.npy")
 owl_data = np.load("doodle_dataset/owl_train_1200.npy")
 owl_testing = np.load("doodle_dataset/owl_testing_200.npy")
 
+# Convert the image to a black and white array
 def vectorize(data):
     vector_data = []
     for i in data:
@@ -27,12 +37,18 @@ def vectorize(data):
     return vector_data
 
 def main():
+    # Inputs: 784 -> one for each pixel in the image
+    # Hidden: 15 nodes and only one layer
+    # Ouputs: 3 -> one for each class of animal
     layers = [784, 15, 1, 3]
     learning_rate = 0.1
     neural_net = MutlilayerPerceptron(layers, learning_rate)
 
+    # Used to randomize the data order
     animals = ['fish', 'octo', 'owl']
+    #Keep track of the number of images used for each animal
     indexes = [0, 0, 0]
+    #Number of iterations used to train the neural network
     size = 1500
 
     for i in range(size):
@@ -51,6 +67,7 @@ def main():
             output_rand = [ [0], [0], [1] ]
         neural_net.train(input_rand, output_rand)
 
+    # Testing the accuracy of the training on 100 images for each animal
     inputs = Matrix(784, 1)
     size = 100
     score = [0, 0, 0]
@@ -81,6 +98,9 @@ def main():
     total = sum(score) // 3
     print("Total accuracy: " + str(total) + "%\n")
 
+    # Allow to test new images on the trained network
+    # Images are taken from what remain of the testing set
+    # "quit" or "q" to exit
     while True:
         animal = input("Fish | Octopus | Owl: ").lower()
         if animal == "q" or animal == "quit":

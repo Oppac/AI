@@ -1,7 +1,12 @@
+# Toy neural network class implemented from scratch
+
+# TODO -> Saving models
+
 from matrix import Matrix
 
 class MutlilayerPerceptron:
-    "Layers: [nb_input_nodes, nb_hidden_nodes, nb_nb_hidden_layers, nb_output_nodes]"
+    # Define the architeture of the neural network
+    # "Layers: [nb_input_nodes, nb_hidden_nodes, nb_nb_hidden_layers, nb_output_nodes]"
     def __init__(self, layers, learning_rate=0.1):
         if len(layers) == 4:
             self.learning_rate = learning_rate
@@ -15,11 +20,14 @@ class MutlilayerPerceptron:
             exit("Invalid layer size: [nb_input_nodes, nb_hidden_nodes, " +
             "nb_nb_hidden_layers, nb_output_nodes]")
 
+    # Create a new random matrix for the weigths
+    # The upper and lower bound may require to be tweak depending on the problem
     def new_matrix(self, nb_rows, nb_cols):
         w_matrix = Matrix(nb_rows, nb_cols)
-        w_matrix.randomize(-0.01, 0.01)
+        w_matrix.randomize(-0.1, 0.1)
         return w_matrix
 
+    # Initialize the weigths matrices with random values
     def weights_init(self):
         weight_matrices = []
 
@@ -35,6 +43,7 @@ class MutlilayerPerceptron:
 
         return weight_matrices
 
+    # Initialize the bias matrices at zero
     def bias_init(self):
         bias_vectors = []
         for _ in range(self.nb_hidden_layers):
@@ -47,15 +56,18 @@ class MutlilayerPerceptron:
 
 ################################################################################
 
+    # Warning: ReLu do not work properly
+    # prime=True => derivative of the activation function
     def activation(self, guess, prime=False):
         if not prime:
-            #guess = guess.apply_sigmoid()
-            guess = guess.apply_relu()
+            guess = guess.apply_sigmoid()
+            #guess = guess.apply_relu()
         else:
-            #guess = guess.apply_sigmoid_prime()
-            guess = guess.apply_relu_prime()
+            guess = guess.apply_sigmoid_prime()
+            #guess = guess.apply_relu_prime()
         return guess
 
+    # Guess = weigths * layer_inputs + bias
     def feedforward(self, inputs):
         guesses = [inputs]
         for i in range(len(self.weight_matrices)):
@@ -65,18 +77,22 @@ class MutlilayerPerceptron:
             guesses.append(guess)
         return guesses
 
-    # Error = answers - guess
+    # Error = correct_answers - guess
     def guess_error(self, guesses, answers):
         guesses = guesses.multiply_scalar(-1)
         errors = answers.add_matrices(guesses)
         return errors
 
+    # gradient = learning_rate * error_vector * sigmoid_prime(output_guess)
     def get_gradient(self, guess, error):
         gradient = self.activation(guess, True)
         gradient = gradient.multiply_vector(error)
         gradient = gradient.multiply_scalar(self.learning_rate)
         return gradient
 
+    # new_weigths = old_weights + (gradient * input_transpose)
+    # Bias increased by the value of the gradient
+    # The error of the "previous layer" is the new error
     def backpropagation(self, guesses, answers):
         error = self.guess_error(guesses[-1], answers)
         for i in range(self.nb_hidden_layers+1, 0, -1):
@@ -88,7 +104,12 @@ class MutlilayerPerceptron:
             self.weight_matrices[i-1] = self.weight_matrices[i-1].add_matrices(delta)
             error = weights_transpose.multiply_matrices(error)
 
+    # For each input received:
+    # 1) Feedforward make a guess
+    # 2) The guess is compared to the correct answer
+    # 3) Backpropagation to adjust the weights based on the error
     def train(self, input_data, correct_outputs):
+        # Put the input in a matrix <- Could be cleaner TODO if time
         inputs = Matrix(); answers = Matrix()
         inputs.give_values(input_data)
         answers.give_values(correct_outputs)
