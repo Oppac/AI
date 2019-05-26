@@ -9,13 +9,14 @@
 # TODO -> Load models instead of training each time
 
 import random
+import time
 import numpy as np
 from multilayer_perceptron import MutlilayerPerceptron
 from matrix import Matrix
 
 # The images of the animals, by default in the doodle_dataset folder
-# Training set: 1200 images
-# Testing set: 200 images
+# Training set: 1200 images per animal
+# Testing set: 200 images per animal
 
 fish_data = np.load("doodle_dataset/fish_train_1200.npy")
 fish_testing = np.load("doodle_dataset/fish_testing_200.npy")
@@ -36,36 +37,60 @@ def vectorize(data):
             vector_data.append([0])
     return vector_data
 
-def main():
-    # Inputs: 784 -> one for each pixel in the image
-    # Hidden: 15 nodes and only one layer
-    # Ouputs: 3 -> one for each class of animal
-    layers = [784, 15, 1, 3]
-    learning_rate = 0.1
-    neural_net = MutlilayerPerceptron(layers, learning_rate)
-
+def create_training_data(sample_size, save=False):
     # Used to randomize the data order
     animals = ['fish', 'octo', 'owl']
     #Keep track of the number of images used for each animal
     indexes = [0, 0, 0]
-    #Number of iterations used to train the neural network
-    size = 1500
+    training_set = []
 
-    for i in range(size):
+    for i in range(sample_size):
         animal_rand = random.choice(animals)
+        data_matrix = Matrix(); label_matrix = Matrix()
         if animal_rand == 'fish':
             indexes[0] += 1
-            input_rand = vectorize(fish_data[indexes[0]])
-            output_rand = [ [1], [0], [0] ]
+            data_matrix.give_values(vectorize(fish_data[indexes[0]]))
+            label_matrix.give_values([ [1], [0], [0] ])
         elif animal_rand == 'octo':
             indexes[1] += 1
-            input_rand = vectorize(octopus_data[indexes[1]])
-            output_rand = [ [0], [1], [0] ]
+            data_matrix.give_values(vectorize(octopus_data[indexes[1]]))
+            label_matrix.give_values([ [0], [1], [0] ])
         elif animal_rand == 'owl':
             indexes[2] += 1
-            input_rand = vectorize(owl_data[indexes[2]])
-            output_rand = [ [0], [0], [1] ]
-        neural_net.train(input_rand, output_rand)
+            data_matrix.give_values(vectorize(owl_data[indexes[2]]))
+            label_matrix.give_values([ [0], [0], [1] ])
+        new_data = [data_matrix, label_matrix]
+        training_set.append(new_data)
+    if save:
+        np.save("doodle_dataset/training_set.npy", training_set)
+    return training_set
+
+
+def main():
+    # Inputs: 784 -> one for each pixel in the image
+    # Hidden: 15 nodes and only one layer
+    # Ouputs: 3 -> one for each class of animal: fish, octopus, owl)
+    layers = [784, 15, 1, 3]
+    learning_rate = 0.1
+    # Number of data in the training set
+    sample_size = 1500
+    # The size of each data batches
+    batch_size = 10
+    # Number of passes through the training dataset
+    epochs = 1
+    neural_net = MutlilayerPerceptron(layers, learning_rate, batch_size, epochs)
+
+    start_time = time.time()
+
+    if 1:
+        training_set = create_training_data(sample_size, True)
+    else:
+        training_set = owl_data = np.load("doodle_dataset/training_set.npy")
+
+
+    neural_net.train(training_set)
+    print("\nTraining time: " + str(time.time() - start_time) + " seconds")
+
 
     # Testing the accuracy of the training on 100 images for each animal
     inputs = Matrix(784, 1)
@@ -91,7 +116,8 @@ def main():
             score[2] += 1
 
     print()
-    print(indexes)
+    #print(indexes)
+    print()
     print("Fish accuracy: " + str(score[0]) + "%")
     print("Octopus accuracy: " + str(score[1]) + "%")
     print("Owl accuracy: " + str(score[2]) + "%")
@@ -101,7 +127,7 @@ def main():
     # Allow to test new images on the trained network
     # Images are taken from what remain of the testing set
     # "quit" or "q" to exit
-    while True:
+    while False:
         animal = input("Fish | Octopus | Owl: ").lower()
         if animal == "q" or animal == "quit":
             break

@@ -7,9 +7,11 @@ from matrix import Matrix
 class MutlilayerPerceptron:
     # Define the architeture of the neural network
     # "Layers: [nb_input_nodes, nb_hidden_nodes, nb_nb_hidden_layers, nb_output_nodes]"
-    def __init__(self, layers, learning_rate=0.1):
+    def __init__(self, layers, learning_rate=0.1, batch_size=16, epochs=4):
         if len(layers) == 4:
             self.learning_rate = learning_rate
+            self.batch_size = batch_size
+            self.epochs = epochs
             self.input_nodes = layers[0]
             self.hidden_nodes = layers[1]
             self.nb_hidden_layers = layers[2]
@@ -24,7 +26,7 @@ class MutlilayerPerceptron:
     # The upper and lower bound may require to be tweak depending on the problem
     def new_matrix(self, nb_rows, nb_cols):
         w_matrix = Matrix(nb_rows, nb_cols)
-        w_matrix.randomize(-0.1, 0.1)
+        w_matrix.randomize(0, 0.1)
         return w_matrix
 
     # Initialize the weigths matrices with random values
@@ -104,15 +106,24 @@ class MutlilayerPerceptron:
             self.weight_matrices[i-1] = self.weight_matrices[i-1].add_matrices(delta)
             error = weights_transpose.multiply_matrices(error)
 
+    def create_batches(self, training_set):
+        batches = []; batch = []; j =0
+        for i in range(len(training_set)):
+            batch.append(training_set[i])
+            j += 1
+            if j == 16:
+                batches.append(batch)
+                batch = []; j = 0
+        return batches
+
     # For each input received:
     # 1) Feedforward make a guess
     # 2) The guess is compared to the correct answer
     # 3) Backpropagation to adjust the weights based on the error
-    def train(self, input_data, correct_outputs):
-        # Put the input in a matrix <- Could be cleaner TODO if time
-        inputs = Matrix(); answers = Matrix()
-        inputs.give_values(input_data)
-        answers.give_values(correct_outputs)
-
-        guesses = self.feedforward(inputs)
-        self.backpropagation(guesses, answers)
+    def train(self, training_set):
+        for epoch in range(self.epochs):
+            all_batches = self.create_batches(training_set)
+            for batch in all_batches:
+                for input, label in batch:
+                    guesses = self.feedforward(input)
+                    self.backpropagation(guesses, label)
