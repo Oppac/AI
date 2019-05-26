@@ -7,7 +7,7 @@ from matrix import Matrix
 class MutlilayerPerceptron:
     # Define the architeture of the neural network
     # "Layers: [nb_input_nodes, nb_hidden_nodes, nb_nb_hidden_layers, nb_output_nodes]"
-    def __init__(self, layers, learning_rate=0.1, batch_size=16, epochs=4):
+    def __init__(self, layers, learning_rate=0.1, batch_size=10, epochs=4):
         if len(layers) == 4:
             self.learning_rate = learning_rate
             self.batch_size = batch_size

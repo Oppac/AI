@@ -92,7 +92,7 @@ class Matrix:
 
     # Sigmoid activation function
     def sigmoid(self, x):
-        return 1 / (1 + exp(-x))
+        return 1.0 / (1.0 + exp(-x))
 
     # ReLu activation function
     def relu(self, x):
@@ -115,7 +115,7 @@ class Matrix:
         for i in range(self.nb_rows):
             for j in range(self.nb_cols):
                 result.values[i][j] += (self.sigmoid(self.values[i][j])
-                                       * (1 - self.sigmoid(self.values[i][j])))
+                                       * (1.0 - self.sigmoid(self.values[i][j])))
         return result
 
     # Apply the reLu function to the elements of the matrix

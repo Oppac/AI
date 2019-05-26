@@ -37,6 +37,7 @@ def vectorize(data):
             vector_data.append([0])
     return vector_data
 
+# Create the training dataset with images in a random order
 def create_training_data(sample_size, save=False):
     # Used to randomize the data order
     animals = ['fish', 'octo', 'owl']
