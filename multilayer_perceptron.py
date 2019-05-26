@@ -2,6 +2,7 @@
 
 # TODO -> Saving models
 
+import numpy as np
 from matrix import Matrix
 
 class MutlilayerPerceptron:
@@ -55,6 +56,12 @@ class MutlilayerPerceptron:
         output_bias = Matrix(self.output_nodes, 1)
         bias_vectors.append(output_bias)
         return bias_vectors
+
+    def save(self):
+        np.savez_compressed(
+            file="doodle_dataset/model.npz",
+            weights=self.weight_matrices,
+        )
 
 ################################################################################
 

@@ -27,7 +27,7 @@ def main():
     learning_rate = 0.1
     sample_size = 1000
     batch_size = 10
-    epochs = 4
+    epochs = 25
     neural_net = MutlilayerPerceptron(layers, learning_rate, batch_size, epochs)
 
     training_set = create_training_data(sample_size)

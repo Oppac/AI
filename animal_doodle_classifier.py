@@ -76,20 +76,21 @@ def main():
     # Number of data in the training set
     sample_size = 1500
     # The size of each data batches
-    batch_size = 10
+    batch_size = 1
     # Number of passes through the training dataset
-    epochs = 1
+    epochs = 4
     neural_net = MutlilayerPerceptron(layers, learning_rate, batch_size, epochs)
 
     start_time = time.time()
 
     if 1:
-        training_set = create_training_data(sample_size, True)
+        training_set = create_training_data(sample_size)
     else:
         training_set = owl_data = np.load("doodle_dataset/training_set.npy")
 
 
     neural_net.train(training_set)
+    neural_net.save()
     print("\nTraining time: " + str(time.time() - start_time) + " seconds")
 
 
@@ -116,10 +117,7 @@ def main():
         if result[2][0] > result[0][0] and result[2][0] > result[1][0]:
             score[2] += 1
 
-    print()
-    #print(indexes)
-    print()
-    print("Fish accuracy: " + str(score[0]) + "%")
+    print("\nFish accuracy: " + str(score[0]) + "%")
     print("Octopus accuracy: " + str(score[1]) + "%")
     print("Owl accuracy: " + str(score[2]) + "%")
     total = sum(score) // 3
@@ -128,7 +126,7 @@ def main():
     # Allow to test new images on the trained network
     # Images are taken from what remain of the testing set
     # "quit" or "q" to exit
-    while False:
+    while True:
         animal = input("Fish | Octopus | Owl: ").lower()
         if animal == "q" or animal == "quit":
             break
