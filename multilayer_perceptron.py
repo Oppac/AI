@@ -57,6 +57,10 @@ class MutlilayerPerceptron:
         bias_vectors.append(output_bias)
         return bias_vectors
 
+    def load(self):
+        file = np.load("doodle_dataset/model.npz")
+        self.weight_matrices = list(file['weights'])
+
     def save(self):
         np.savez_compressed(
             file="doodle_dataset/model.npz",
@@ -114,11 +118,11 @@ class MutlilayerPerceptron:
             error = weights_transpose.multiply_matrices(error)
 
     def create_batches(self, training_set):
-        batches = []; batch = []; j =0
+        batches = []; batch = []; j = 0
         for i in range(len(training_set)):
             batch.append(training_set[i])
             j += 1
-            if j == 16:
+            if j == self.batch_size:
                 batches.append(batch)
                 batch = []; j = 0
         return batches

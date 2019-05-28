@@ -11,6 +11,7 @@
 import random
 import time
 import numpy as np
+from PIL import Image
 from multilayer_perceptron import MutlilayerPerceptron
 from matrix import Matrix
 
@@ -89,8 +90,8 @@ def main():
         training_set = owl_data = np.load("doodle_dataset/training_set.npy")
 
 
-    neural_net.train(training_set)
-    neural_net.save()
+    #neural_net.train(training_set)
+    neural_net.load()
     print("\nTraining time: " + str(time.time() - start_time) + " seconds")
 
 
@@ -150,5 +151,17 @@ def main():
 
         print("\nInput image is the {} image number {}".format(animal, img_nb-100))
         print("This image is an " + ani + "\n")
+        img = Image.new('1', (28, 28))
+        pixels = img.load()
+
+        cpt = 0
+        for i in range(img.size[0]):
+            for j in range(img.size[1]):
+                pixels[i, j] = test.values[cpt][0]
+                cpt += 1
+        img = img.resize((800, 800))
+        img.show()
+
+
 
 main()
